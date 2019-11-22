@@ -4,46 +4,16 @@
 #include <sysctl.h>
 #include "timer.h"
 #include "Serial.h"
+#include "enums.h"
+#include "expectedTime.h"
+#include "setup.h"
+#include "signal.h"
 
 #define TOLERANCE 20
 
-int  done = 0 , period = 0, first = 0;
-
-//reads a bit
-int bitRead();
-
-enum button
-{
-    POWER,
-    A,
-    B,
-    C,
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    CIRCLE
-};
-
-enum state
-{
-    START_LOW,
-    START_HIGH,
-    LOW,
-    HI0,
-    HI1,
-    NONE
-};
+int  period = 0, first = 0;
 
 int curState = NONE;
-
-
-
-
-
-void setup();
-
-void PLLInit();
 
 int getButton()
 {
@@ -61,16 +31,28 @@ int getButton()
     }
 }
 
-void read ()
+void read (int period)
 {
-    while(done == 0);
-    done = 0;
-    int b = bitRead();
-    if(b == NONE || b == START_LOW)
+    int b = bitRead(period);
+    if(b == NONE)
     {
         reset();
         curState = b;
         return;
+    }
+    else if (b == START_LOW)
+    {
+        curState = b;
+        return;
+    }
+    else if(curState == START_LOW && b == REPEAT_HI)
+    {
+        curState = REPEAT_HI;
+        return;
+    }
+    else if(curState == REPEAT_HI && b == LOW)
+    {
+        curState = NONE;
     }
     else if(b == START_HIGH && curState == START_LOW)
     {
@@ -84,6 +66,8 @@ void read ()
     }
     else if(curState == LOW && (b == HI0 || b == HI1))
     {
+            if(complete())
+                reset();
             if(b == HI0)
                 add(0);
             else if(b == HI1)
@@ -91,6 +75,7 @@ void read ()
             curState = START_HIGH;
             return;
     }
+    reset();
     curState = NONE;
 }
 
@@ -105,49 +90,29 @@ int main(void)
     setup();
     SetupSerial();
 
-    while (1)
-    {
-        if (complete())
-        {
-            int local = getButton();
-            GPIO_PORTF_DATA_R = local;
-            reset();
-        }
-        read();
-    }
+    while (1);
+    // {
+        // if (complete())
+        // {
+        //     int local = getButton();
+        //     GPIO_PORTF_DATA_R = local;
+        //     reset();
+        // }
+    // }
     return 0;
 }
 
 
+//this is a handler for the IR receiver
+//This handler is called for every edge: rising or falling
+//This function reads the signal using read()
+//This function should be fast enough to detect every edge
 void Timer0A_Handler(void)
 {
     period = (first - TIMER0_TAR_R) & 0x00FFFFFF;
-    TIMER0_ICR_R = 0x00000004; //acknowledgement
+    read(period);
     first = TIMER0_TAR_R ;
-    done = 1;
+    TIMER0_ICR_R = 0x00000004; //acknowledgement
 }
 
 
-#define TOLERANCE 20
-
-
-int in_range(int quantity, int expected)
-{
-    return quantity >= (expected* (100-TOLERANCE))/100
-                && quantity <= (expected* (100+TOLERANCE))/100;
-}
-
-int bitRead(struct Signal)
-{
-    if(in_range(period,et.startLow))
-        return START_LOW;
-    if(in_range(period,et.startHigh))
-        return START_HIGH;
-    if(in_range(period,et.low) && curState != LOW)
-        return LOW;
-    if(in_range(period,et.hi0))
-        return HI0;
-    if(in_range(period,et.hi1))
-        return HI1;
-    return NONE;
-}
