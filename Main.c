@@ -15,6 +15,7 @@ int  period = 0, first = 0, oldButton = -1;
 
 int curState = NONE;
 
+//gets which button was pressed
 int getButton()
 {
     switch(convert())
@@ -29,6 +30,9 @@ int getButton()
     return -1;
 }
 
+
+//state change function
+//populates the signal
 void read ()
 {
     int b = bitRead(period);
@@ -92,6 +96,7 @@ int main(void)
     return 0;
 }
 
+//performs the necessary action on the car
 void action(int button)
 {
     return SerialWriteInt(button);
@@ -111,7 +116,7 @@ void action(int button)
 //This handler is called for every edge: rising or falling
 //This function reads the signal using read()
 //This function should be fast enough to detect every edge
-void Timer0A_Handler(void)
+void Timer2A_Handler(void)
 {
     period = (first - TIMER0_TAR_R) & 0x00FFFFFF;
     read();
@@ -126,8 +131,8 @@ void Timer0A_Handler(void)
             oldButton = button;
         }
     }
-    first = TIMER0_TAR_R ;
-    TIMER0_ICR_R = 0x00000004; //acknowledgement
+    first = TIMER2_TAR_R ;
+    TIMER2_ICR_R = 0x00000004; //acknowledgement
 }
 
 

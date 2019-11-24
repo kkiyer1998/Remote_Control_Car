@@ -14,6 +14,7 @@ void setup()
 {
     Timer0Setup();
     Timer2Setup();
+    portFSetup();
 }
 
 void PLLInit()
@@ -31,7 +32,9 @@ void PLLInit()
     SYSCTL_RCC2_R &= ~0x00000800;
 }
 
-void Timer0Setup() // FOR THE MOTOR: PWM
+// FOR THE MOTOR: PWM
+//uses PB6 and PB7
+void Timer0Setup()
 {
     SYSCTL_RCGCTIMER_R |= 0X01; //ACTIVATE TIMER 0
     SYSCTL_RCGCGPIO_R |= 0X02; //ACTIVATE PORT B
@@ -54,6 +57,8 @@ void Timer0Setup() // FOR THE MOTOR: PWM
     TIMER0_CTL_R |= 0X00000101; //ENABLE TIMER0
 }
 
+//timer for IR sensor : setup for input capture
+//uses PB0
 void Timer2Setup()
 {
     //TURN ON THE CLOCK FOR PORT B
@@ -78,4 +83,28 @@ void Timer2Setup()
 
     NVIC_PRI5_R = (NVIC_PRI5_R&0x00FFFFFF) | 0x40000000; //TIMER 2A PRIORITY 2
     NVIC_EN0_R = 1<<23;
+}
+
+//test port
+void portFSetup()
+{
+    GPIO_PORTF_CR_R = 0XFF;
+
+    //SELECT ANALOG FUNCTIONALITY
+    //0 MEANS DISABLE
+    GPIO_PORTF_AMSEL_R = 0X00;
+
+    //CONFIGURE PCTL REGISTER
+    GPIO_PORTF_PCTL_R = 0X00000000;
+
+    //SET INPUT OR OUTPUT : 0 IS INPUT AND 1 IS OUTPUT
+    GPIO_PORTF_DIR_R = 0XFF;
+
+    //KEEP ALTERNATE FUNCTIONALITY TO 0
+    GPIO_PORTF_AFSEL_R = 0X00;
+
+    //ENABLE DIGITAL PORTS
+    GPIO_PORTF_DEN_R = 0XFF;
+
+    GPIO_PORTF_PUR_R = 0XFF;
 }
