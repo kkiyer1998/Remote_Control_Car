@@ -18,6 +18,8 @@ struct Car car;
 void power()
 {
     car.power = car.power == 0 ? 1 : 0;
+    if(!car.power)
+        halt();
 }
 
 void increaseSpeed()
@@ -54,8 +56,20 @@ void turnLeft()
     car.rightSpeed = 20;
 }
 
-void turnLeft()
+void turnRight()
 {
     car.rightSpeed = 5;
     car.leftSpeed = 20;
+}
+
+void halt()
+{
+    car.leftSpeed = 0;
+    car.rightSpeed = 0;
+}
+
+void commitChange()
+{
+    TIMER0_TAMTCHR_R = (car.leftSpeed*TIMER0_TAILR_R)/100;
+    TIMER0_TBMTCHR_R = (car.rightSpeed*TIMER0_TAILR_R)/100;
 }

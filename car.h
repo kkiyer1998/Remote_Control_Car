@@ -32,5 +32,7 @@ void straighten();
 
 void turnLeft();
 
-void turnLeft();
+void turnRight();
+
+void halt();
 

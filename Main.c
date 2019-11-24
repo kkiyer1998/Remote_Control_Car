@@ -11,7 +11,7 @@
 
 #define TOLERANCE 20
 
-int  period = 0, first = 0;
+int  period = 0, first = 0, oldButton = -1;
 
 int curState = NONE;
 
@@ -20,18 +20,16 @@ int getButton()
     switch(convert())
     {
         case 0x00FF629D : return POWER;
-        case 0x00FF22DD : return A;
-        case 0x00FF02FD : return B;
-        case 0x00FFC23D : return C;
         case 0x00FF9867 : return UP;
         case 0x00FF38C7 : return DOWN;
         case 0x00FF30CF : return LEFT;
         case 0x00FF7A85 : return RIGHT;
         case 0x00FF18E7 : return CIRCLE;
     }
+    return -1;
 }
 
-void read (int period)
+void read ()
 {
     int b = bitRead(period);
     if(b == NONE)
@@ -45,7 +43,7 @@ void read (int period)
         curState = b;
         return;
     }
-    else if(curState == START_LOW && b == REPEAT_HI)
+    else if(curState == START_LOW && complete() && b == REPEAT_HI)
     {
         curState = REPEAT_HI;
         return;
@@ -91,15 +89,21 @@ int main(void)
     SetupSerial();
 
     while (1);
-    // {
-        // if (complete())
-        // {
-        //     int local = getButton();
-        //     GPIO_PORTF_DATA_R = local;
-        //     reset();
-        // }
-    // }
     return 0;
+}
+
+void action(int button)
+{
+    return SerialWriteInt(button);
+    switch (button)
+    {
+        case POWER: return power();
+        case UP: return car.direction == FORWARD ? increaseSpeed() : decreaseSpeed();
+        case DOWN: return car.direction == BACKWARD ? increaseSpeed() : decreaseSpeed();
+        case LEFT: return turnLeft();
+        case RIGHT: return turnRight();
+        case CIRCLE: return halt();
+    }
 }
 
 
@@ -110,7 +114,18 @@ int main(void)
 void Timer0A_Handler(void)
 {
     period = (first - TIMER0_TAR_R) & 0x00FFFFFF;
-    read(period);
+    read();
+    if(complete())
+    {
+        if(curState = REPEAT_HI && oldButton != POWER)
+            action(oldButton);
+        else if(complete() && curState != REPEAT_HI)
+        {
+            int button = getButton();
+            action(button);
+            oldButton = button;
+        }
+    }
     first = TIMER0_TAR_R ;
     TIMER0_ICR_R = 0x00000004; //acknowledgement
 }
