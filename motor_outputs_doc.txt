@@ -1,0 +1,7 @@
+Motor outputs:
+
+Write 1 to f0 and 0 to f1 to move car forward
+Write 0 to f0 and 1 to f1 to move car backward
+
+Speed of left side is controlled by b6
+Speed of right side is controlled by b7

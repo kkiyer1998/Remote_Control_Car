@@ -28,7 +28,7 @@ void increaseSpeed()
 {
     if(car.direction == FORWARD)
     {
-         int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
+        int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
         int newSpeed = averageSpeed + 5 > 100 ? 100 : averageSpeed + 5;
         car.leftSpeed = car.rightSpeed =newSpeed;
     }
