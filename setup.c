@@ -10,13 +10,6 @@
 #include "signal.h"
 
 
-void setup()
-{
-    Timer0Setup();
-    Timer2Setup();
-    portFSetup();
-}
-
 void PLLInit()
 {
     SYSCTL_RCC2_R |= 0x80000000;
@@ -46,12 +39,12 @@ void Timer0Setup()
     TIMER0_CFG_R = 0X00000404; //CONFIGURE FOR 16-BIT TIMER MODE
 
     TIMER0_TAMR_R = 0X0000000A; //PWM AND PERIODIC MODE
-    TIMER0_TALR_R = 0X1F40; // PERIOD = 100microsec
+    TIMER0_TAILR_R = 0X1F40; // PERIOD = 100microsec
     TIMER0_TAMATCHR_R = TIMER0_TAILR_R; // INITIALIZE DUTY CYCLE = 0%
 
 
     TIMER0_TBMR_R = 0X0000000A; //PWM AND PERIODIC MODE
-    TIMER0_TBLR_R = 0X1F40; // PERIOD = 100microsec
+    TIMER0_TBILR_R = 0X1F40; // PERIOD = 100microsec
     TIMER0_TBMATCHR_R = TIMER0_TBILR_R; // INITIALIZE DUTY CYCLE = 0%
 
     TIMER0_CTL_R |= 0X00000101; //ENABLE TIMER0
@@ -107,4 +100,13 @@ void portFSetup()
     GPIO_PORTF_DEN_R = 0XFF;
 
     GPIO_PORTF_PUR_R = 0XFF;
+}
+
+
+void setup()
+{
+    Timer0Setup();
+    Timer2Setup();
+    portFSetup();
+    setEnumTime();
 }

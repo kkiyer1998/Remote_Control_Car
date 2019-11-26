@@ -10,12 +10,14 @@
 
 struct expectedTime
 {
-    const int startHigh:4500*80;
-    const int startLow:9000*80;
-    const int low:560*80;
-    const int hi0:560*80;
-    const int hi1:1690*80;
-    const int repeatHi:2250*80;
+    int startHigh;
+    int startLow;
+    int low;
+    int hi0;
+    int hi1;
+    int repeatHi;
 };
+
+int bitRead(int,int);
 
 #endif

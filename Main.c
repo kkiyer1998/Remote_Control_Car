@@ -8,12 +8,15 @@
 #include "expectedTime.h"
 #include "setup.h"
 #include "signal.h"
+#include "car.h"
 
 #define TOLERANCE 20
 
-int  period = 0, first = 0, oldButton = -1;
+int  period = 0, first = 0;
 
 int curState = NONE;
+
+struct expectedTime et;
 
 //gets which button was pressed
 int getButton()
@@ -35,26 +38,12 @@ int getButton()
 //populates the signal
 void read ()
 {
-    int b = bitRead(period);
-    if(b == NONE)
+    int b = bitRead(period,curState);
+    if(b == NONE || b == START_LOW)
     {
         reset();
         curState = b;
         return;
-    }
-    else if (b == START_LOW)
-    {
-        curState = b;
-        return;
-    }
-    else if(curState == START_LOW && complete() && b == REPEAT_HI)
-    {
-        curState = REPEAT_HI;
-        return;
-    }
-    else if(curState == REPEAT_HI && b == LOW)
-    {
-        curState = NONE;
     }
     else if(b == START_HIGH && curState == START_LOW)
     {
@@ -68,8 +57,6 @@ void read ()
     }
     else if(curState == LOW && (b == HI0 || b == HI1))
     {
-            if(complete())
-                reset();
             if(b == HI0)
                 add(0);
             else if(b == HI1)
@@ -77,7 +64,6 @@ void read ()
             curState = START_HIGH;
             return;
     }
-    reset();
     curState = NONE;
 }
 
@@ -122,14 +108,8 @@ void Timer2A_Handler(void)
     read();
     if(complete())
     {
-        if(curState = REPEAT_HI && oldButton != POWER)
-            action(oldButton);
-        else if(complete() && curState != REPEAT_HI)
-        {
-            int button = getButton();
-            action(button);
-            oldButton = button;
-        }
+        int button = getButton();
+        action(button);
     }
     first = TIMER2_TAR_R ;
     TIMER2_ICR_R = 0x00000004; //acknowledgement

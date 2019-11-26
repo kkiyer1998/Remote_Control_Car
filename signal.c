@@ -8,9 +8,9 @@
 #include "signal.h"
 
 
+struct Signal signal;
 
-
-void reset(struct Signal *signal)
+void reset()
 {
     signal.index = 0;
     int i;
@@ -18,12 +18,12 @@ void reset(struct Signal *signal)
         signal.arr[i] = 0;
 }
 
-int complete(struct Signal *signal)
+int complete()
 {
     return signal.index == 32;
 }
 
-void add(struct Signal *signal,int b)
+void add(int b)
 {
     if(complete(signal))
         return ;
@@ -33,7 +33,7 @@ void add(struct Signal *signal,int b)
 
 //requires !complete()
 //converts a Signal to integer
-unsigned int convert(struct Signal *signal)
+unsigned int convert()
 {
     int result = 0, i =0;
     for(; i < 32; i++)

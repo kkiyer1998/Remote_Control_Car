@@ -23,17 +23,17 @@ struct Signal
 
 //resets the signal
 //the signal is empty after the function returns
-void reset(struct Signal *);
+void reset();
 
 //checks if the signal is complete
 //checks whether we have read 32 bits
-int complete(struct Signal *);
+int complete();
 
 //adds a bit to the end of the signal
-void add(struct Signal *,int);
+void add(int);
 
 //requires !complete()
 //converts a Signal to integer
-unsigned int convert(struct Signal *);
+unsigned int convert();
 
 #endif

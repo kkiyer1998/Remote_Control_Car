@@ -11,16 +11,24 @@
 
 #define TOLERANCE 20
 
-struct expectedTime et;
+void setEnumTime()
+{
+    et.startHigh=4500*80;
+    et.startLow=9000*80;
+    et.low=560*80;
+    et.hi0=560*80;
+    et.hi1=1690*80;
+    et.repeatHi=2250*80;
+}
 
-int in_range(int quantity)
+int in_range(int quantity, int expected)
 {
     return quantity >= (expected* (100-TOLERANCE))/100
                 && quantity <= (expected* (100+TOLERANCE))/100;
 }
 
 //the IR signal is inverted
-int bitRead(int period)
+int bitRead(int period, int curState)
 {
     if(in_range(period,et.startLow))
         return START_LOW;
