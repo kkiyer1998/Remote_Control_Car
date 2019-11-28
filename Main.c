@@ -16,7 +16,8 @@ int  period = 0, first = 0;
 
 int curState = NONE;
 
-struct expectedTime et;
+extern struct expectedTime et;
+extern struct Car car;
 
 //gets which button was pressed
 int getButton()

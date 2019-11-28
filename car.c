@@ -15,12 +15,18 @@
 
 struct Car car;
 
+void carSetup()
+{
+    car.power = 0;
+    car.direction = FORWARD;
+    halt();
+}
+
 //turns the car on or off
 void power()
 {
     car.power = car.power == 0 ? 1 : 0;
-    if(!car.power)
-        halt();
+    halt();
 }
 
 //this increase the speed of the car by 5%
@@ -33,9 +39,7 @@ void increaseSpeed()
         car.leftSpeed = car.rightSpeed =newSpeed;
     }
     else
-        decreaseSpeed()
-
-
+        decreaseSpeed();
 }
 
 //this decreses the speed of the car by 5%
@@ -95,6 +99,6 @@ void halt()
 // LOOK AT THIS ONE WHILE SETTING UP THE MOTOR DRIVER
 void commitChange()
 {
-    TIMER0_TAMTCHR_R = (car.leftSpeed*TIMER0_TAILR_R)/100;
-    TIMER0_TBMTCHR_R = (car.rightSpeed*TIMER0_TAILR_R)/100;
+    TIMER0_TAMATCHR_R = (car.leftSpeed*TIMER0_TAILR_R)/100;
+    TIMER0_TBMATCHR_R = (car.rightSpeed*TIMER0_TBILR_R)/100;
 }

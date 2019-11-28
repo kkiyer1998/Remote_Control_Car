@@ -11,6 +11,8 @@
 
 #define TOLERANCE 20
 
+struct expectedTime et;
+
 void setEnumTime()
 {
     et.startHigh=4500*80;

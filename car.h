@@ -14,11 +14,13 @@
 
 struct Car
 {
-    unsigned int leftSpeed : 0; //speeds are in %
-    unsigned int rightSpeed : 0; //speeds are in %
-    int direction : FORWARD;
-    int power : 0;
+    unsigned int leftSpeed; //speeds are in %
+    unsigned int rightSpeed; //speeds are in %
+    int direction;
+    int power;
 };
+
+void carSetup();
 
 void power();
 

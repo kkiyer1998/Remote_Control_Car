@@ -60,7 +60,7 @@ void Timer2Setup()
 
     GPIO_PORTB_DEN_R |= 0X01; // ENABLE DIGITAL I/O ON PB0
     GPIO_PORTB_AFSEL_R |= 0X01; //ENABLE ALTERNATE FUNCTIONALITY ON PB0
-    GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R & 0xF0FFFFFF) + 0x07000000;
+    GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R & 0xFFFFFFF0) + 0x00000007;
 
     TIMER2_CTL_R &= ~0x00000001; // Disable timer 2 for configuration
     TIMER2_CFG_R = 0x00000004; // Configure for 16-bit capture mode
@@ -81,6 +81,9 @@ void Timer2Setup()
 //test port
 void portFSetup()
 {
+    //TURN ON THE CLOCK FOR PORT F
+    SYSCTL_RCGCGPIO_R |= 0x20;
+
     GPIO_PORTF_CR_R = 0XFF;
 
     //SELECT ANALOG FUNCTIONALITY
@@ -109,4 +112,5 @@ void setup()
     Timer2Setup();
     portFSetup();
     setEnumTime();
+    carSetup();
 }
