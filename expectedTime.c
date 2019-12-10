@@ -20,7 +20,6 @@ void setEnumTime()
     et.low=560*80;
     et.hi0=560*80;
     et.hi1=1690*80;
-    et.repeatHi=2250*80;
 }
 
 int in_range(int quantity, int expected)
@@ -42,7 +41,5 @@ int bitRead(int period, int curState)
         return HI0;
     if(in_range(period,et.hi1))
         return HI1;
-    if(in_range(period,et.repeatHi))
-        return REPEAT_HI;
     return NONE;
 }

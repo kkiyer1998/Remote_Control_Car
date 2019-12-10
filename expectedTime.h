@@ -15,7 +15,6 @@ struct expectedTime
     int low;
     int hi0;
     int hi1;
-    int repeatHi;
 };
 
 int bitRead(int,int);

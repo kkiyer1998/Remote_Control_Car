@@ -68,6 +68,7 @@ void Timer2Setup()
 
     TIMER2_CTL_R = 0X0000000C; // CONFIGURE FOR BOTH RISING AND FALLING EDGE
     TIMER2_TAILR_R = 0x0000FFFF; // Start value for count down
+    TIMER2_TAPR_R = 0xFF; // Activate pre-scale
 
     TIMER2_IMR_R |= 0x00000004; // Enable Input capture interrupts
 
@@ -113,4 +114,6 @@ void setup()
     portFSetup();
     setEnumTime();
     carSetup();
+    reset();
+    SetupSerial();
 }

@@ -37,8 +37,9 @@ int getButton()
 
 //state change function
 //populates the signal
-void read ()
+void read (int period)
 {
+    int local = period;
     int b = bitRead(period,curState);
     if(b == NONE || b == START_LOW)
     {
@@ -86,6 +87,7 @@ int main(void)
 //performs the necessary action on the car
 void action(int button)
 {
+    int local = button;
     return SerialWriteInt(button);
     switch (button)
     {
@@ -105,14 +107,22 @@ void action(int button)
 //This function should be fast enough to detect every edge
 void Timer2A_Handler(void)
 {
-    period = (first - TIMER0_TAR_R) & 0x00FFFFFF;
-    read();
+
+    period = (first-TIMER2_TAR_R) & 0x00FFFFFF;
+    //SerialWriteInt(first);
+    //SerialWriteInt(TIMER2_TAR_R);
+
+    int local = period;
+    read(period);
+    local = curState;
     if(complete())
     {
         int button = getButton();
         action(button);
     }
     first = TIMER2_TAR_R ;
+    //SerialWriteInt(first);
+    //SerialWriteInt(0);
     TIMER2_ICR_R = 0x00000004; //acknowledgement
 }
 
