@@ -37,7 +37,7 @@ void carSetup()
 void power()
 {
     car.power = car.power == 0 ? 1 : 0;
-    GPIO_PORTF_DATA_R |= car.power << 4;
+    GPIO_PORTF_DATA_R = (GPIO_PORTF_DATA_R & ~0x10)| car.power << 4;
     halt();
     int local = car.direction;
     car.direction = FORWARD;
@@ -56,7 +56,14 @@ void increaseSpeed()
         car.leftSpeed = car.rightSpeed =newSpeed;
     }
     else
-        decreaseSpeed();
+    {
+        int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
+        int newSpeed = averageSpeed - 5 < 0 ? 0 : averageSpeed - 5;
+        if (newSpeed == 0) {
+            car.direction = FORWARD;
+        }
+        car.leftSpeed = car.rightSpeed = newSpeed;
+    }
 }
 
 //this decreses the speed of the car by 5%
@@ -64,18 +71,23 @@ void increaseSpeed()
 void decreaseSpeed()
 {
     if(car.power == 0)
-            return;
-    int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
-    if(averageSpeed - 5 < 0)
-    {
-        changeDirection();
-        car.leftSpeed = car.rightSpeed = averageSpeed + 5;
         return;
-    }
     if(car.direction == FORWARD)
-        car.leftSpeed = car.rightSpeed = averageSpeed - 5;
+    {
+        int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
+        int newSpeed = averageSpeed - 5 < 0 ? 0 : averageSpeed - 5;
+        if (newSpeed == 0) {
+            car.direction = BACKWARD;
+        }
+        int local = car.direction;
+        car.leftSpeed = car.rightSpeed =newSpeed;
+    }
     else
-        increaseSpeed();
+    {
+        int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
+        int newSpeed = averageSpeed + 5 > 100 ? 100 : averageSpeed + 5;
+        car.leftSpeed = car.rightSpeed = newSpeed;
+    }
 }
 
 //This function changes the direction of the car
@@ -88,7 +100,7 @@ void changeDirection()
     if(car.direction == FORWARD)
         GPIO_PORTF_DATA_R = (GPIO_PORTF_DATA_R & ~0x3) | 1;
     else
-        GPIO_PORTF_DATA_R = (GPIO_PORTF_DATA_R & ~0x3) |0x10;
+        GPIO_PORTF_DATA_R = (GPIO_PORTF_DATA_R & ~0x3) |0x2;
 
 }
 
@@ -123,5 +135,6 @@ void halt()
 {
     car.leftSpeed = 0;
     car.rightSpeed = 0;
+    car.direction = FORWARD;
 }
 

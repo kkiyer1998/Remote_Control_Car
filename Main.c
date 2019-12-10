@@ -90,8 +90,8 @@ void action(int button)
     switch (button)
     {
         case POWER: return power();
-        case UP: return car.direction == FORWARD ? increaseSpeed() : decreaseSpeed();
-        case DOWN: return car.direction == BACKWARD ? increaseSpeed() : decreaseSpeed();
+        case UP: return increaseSpeed();
+        case DOWN: return decreaseSpeed();
         case LEFT: return turnLeft();
         case RIGHT: return turnRight();
         case CIRCLE: return halt();
@@ -120,7 +120,6 @@ void Timer2A_Handler(void)
         action(button);
         commitChange(); //reflects the changes on the data-structure to car
         SysTick_Wait1ms(1); //debounce
-        local = car.direction;
     }
     first = TIMER2_TAR_R ;
     //SerialWriteInt(first);
