@@ -87,8 +87,6 @@ int main(void)
 //performs the necessary action on the car
 void action(int button)
 {
-    int local = button;
-    return SerialWriteInt(button);
     switch (button)
     {
         case POWER: return power();
@@ -118,7 +116,11 @@ void Timer2A_Handler(void)
     if(complete())
     {
         int button = getButton();
+        SerialWriteInt(button);
         action(button);
+        commitChange(); //reflects the changes on the data-structure to car
+        SysTick_Wait1ms(1); //debounce
+        local = car.direction;
     }
     first = TIMER2_TAR_R ;
     //SerialWriteInt(first);

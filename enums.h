@@ -3,10 +3,7 @@
 
 enum button
 {
-    POWER,
-    A,
-    B,
-    C,
+    POWER = 1,
     UP,
     DOWN,
     LEFT,
