@@ -119,7 +119,7 @@ void Timer2A_Handler(void)
         SerialWriteInt(button);
         action(button);
         commitChange(); //reflects the changes on the data-structure to car
-        SysTick_Wait1ms(1); //debounce
+        reset();
     }
     first = TIMER2_TAR_R ;
     //SerialWriteInt(first);
