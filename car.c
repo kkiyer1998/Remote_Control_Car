@@ -19,8 +19,8 @@ struct Car car;
 // LOOK AT THIS ONE WHILE SETTING UP THE MOTOR DRIVER
 void commitChange()
 {
-    TIMER0_TAMATCHR_R = (car.leftSpeed*TIMER0_TAILR_R)/100;
-    TIMER0_TBMATCHR_R =  (car.rightSpeed*TIMER0_TBILR_R)/100;
+    TIMER0_TAMATCHR_R = ((100-car.leftSpeed)*(TIMER0_TAILR_R-10))/100;
+    TIMER0_TBMATCHR_R =  ((100-car.rightSpeed)*(TIMER0_TBILR_R-10))/100;
 }
 
 
@@ -37,7 +37,7 @@ void carSetup()
 void power()
 {
     car.power = car.power == 0 ? 1 : 0;
-    GPIO_PORTF_DATA_R = (GPIO_PORTF_DATA_R & ~0x10)| car.power << 4;
+    GPIO_PORTF_DATA_R = (GPIO_PORTF_DATA_R & ~0x10)| (car.power << 4);
     halt();
     int local = car.direction;
     car.direction = FORWARD;
@@ -52,15 +52,15 @@ void increaseSpeed()
     if(car.direction == FORWARD)
     {
         int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
-        int newSpeed = averageSpeed + 5 > 100 ? 100 : averageSpeed + 5;
+        int newSpeed = averageSpeed + 10 > 100 ? 100 : averageSpeed + 10;
         car.leftSpeed = car.rightSpeed =newSpeed;
     }
     else
     {
         int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
-        int newSpeed = averageSpeed - 5 < 0 ? 0 : averageSpeed - 5;
+        int newSpeed = averageSpeed - 10 < 0 ? 0 : averageSpeed - 10;
         if (newSpeed == 0) {
-            car.direction = FORWARD;
+            changeDirection();
         }
         car.leftSpeed = car.rightSpeed = newSpeed;
     }
@@ -75,9 +75,9 @@ void decreaseSpeed()
     if(car.direction == FORWARD)
     {
         int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
-        int newSpeed = averageSpeed - 5 < 0 ? 0 : averageSpeed - 5;
+        int newSpeed = averageSpeed - 10 < 0 ? 0 : averageSpeed - 10;
         if (newSpeed == 0) {
-            car.direction = BACKWARD;
+            changeDirection();
         }
         int local = car.direction;
         car.leftSpeed = car.rightSpeed =newSpeed;
@@ -85,7 +85,7 @@ void decreaseSpeed()
     else
     {
         int averageSpeed = (car.leftSpeed+car.rightSpeed)/2;
-        int newSpeed = averageSpeed + 5 > 100 ? 100 : averageSpeed + 5;
+        int newSpeed = averageSpeed + 10 > 100 ? 100 : averageSpeed + 10;
         car.leftSpeed = car.rightSpeed = newSpeed;
     }
 }
@@ -101,6 +101,7 @@ void changeDirection()
         GPIO_PORTF_DATA_R = (GPIO_PORTF_DATA_R & ~0x3) | 1;
     else
         GPIO_PORTF_DATA_R = (GPIO_PORTF_DATA_R & ~0x3) |0x2;
+    //halt();
 
 }
 
@@ -136,5 +137,6 @@ void halt()
     car.leftSpeed = 0;
     car.rightSpeed = 0;
     car.direction = FORWARD;
+    GPIO_PORTF_DATA_R = (GPIO_PORTF_DATA_R & ~0x3) | 1;
 }
 
