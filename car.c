@@ -15,6 +15,14 @@
 
 struct Car car;
 
+
+int voltage;
+void Timer3A_Handler(void) {
+    ADC0_ISC_R = 0x008;
+    voltage = ADC0_SSFIFO3_R;
+    //SerialWriteInt(voltage);
+}
+
 //changes the duty cycle of the timers
 // LOOK AT THIS ONE WHILE SETTING UP THE MOTOR DRIVER
 void commitChange()

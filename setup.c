@@ -108,6 +108,56 @@ void portFSetup()
     GPIO_PORTF_PUR_R = 0XFF;
 }
 
+void A2DSetup() {
+//    SYSCTL_RCGCGPIO_R |= 0x10; // 1) activate clock for Port E
+//    while((SYSCTL_PRGPIO_R&0x10) == 0){};
+//    GPIO_PORTE_DIR_R &= ~0x10; // 2) make PE4 input
+//    GPIO_PORTE_AFSEL_R |= 0x10; // 3) enable alternate function on PE4
+//    GPIO_PORTE_DEN_R &= ~0x10; // 4) disable digital I/O on PE4
+//    GPIO_PORTE_AMSEL_R |= 0x10; // 5) enable analog function on PE4
+//    SYSCTL_RCGCADC_R |= 0x01; // 6) activate ADC0
+//    ADC0_PC_R = 0x01; // 7) configure for 125K
+//    ADC0_SSPRI_R = 0x0123; // 8) Sequencer 3 is highest priority
+//    ADC0_ACTSS_R &= ~0x0008; // 9) disable sample sequencer 3
+//    ADC0_EMUX_R &= ~0xF000; // 10) seq3 is software trigger
+//    ADC0_SSMUX3_R = (ADC0_SSMUX3_R&0xFFFFFFF0) // 11) clear SS3 field
+//    + 9; // set channel Ain9 (PE4)
+//    ADC0_SSCTL3_R = 0x0006; // 12) no TS0 D0, yes IE0 END0
+//    ADC0_IM_R &= ~0x0008; // 13) disable SS3 interrupts
+//    ADC0_ACTSS_R |= 0x0008; // 14) enable sample sequencer 3
+    SYSCTL_RCGCGPIO_R |= 0x10; // 1) activate clock for Port E
+    while((SYSCTL_PRGPIO_R&0x10) == 0){};
+    GPIO_PORTE_DIR_R &= ~0x10; // 2) make PE4 input
+    GPIO_PORTE_AFSEL_R |= 0x10; // 3) enable alternate fun on PE4
+    GPIO_PORTE_DEN_R &= ~0x10; // 4) disable digital I/O on PE4
+    GPIO_PORTE_AMSEL_R |= 0x10; // 5) enable analog fun on PE4
+    SYSCTL_RCGCADC_R |= 0x01; // 6) activate ADC0
+    int delay = SYSCTL_RCGCADC_R; // extra time to stabilize
+    delay = SYSCTL_RCGCADC_R;
+    delay = SYSCTL_RCGCADC_R;
+    delay = SYSCTL_RCGCADC_R;
+    ADC0_PC_R = 0x01; // 7) configure for 125K
+    ADC0_SSPRI_R = 0x0123; // 8) Seq 3 is highest priority
+    SYSCTL_RCGCTIMER_R |= 0x08; // activate timer3
+    TIMER3_CTL_R = 0; // disable timer3 during setup
+    TIMER3_CTL_R = 0x20; // enable timer3A trigger on ADC
+    delay = SYSCTL_RCGCADC_R;
+    TIMER3_CFG_R = 0; // 32 bit timer
+    TIMER3_TAMR_R = 0x02; // periodic mode
+    TIMER3_TAPR_R = 0;
+    TIMER3_TAILR_R = 0xFFF;
+    TIMER3_CTL_R |= 0x01; // enable timer3 interrupt
+    ADC0_ACTSS_R &= ~0x0008; // 9) disable sample sequencer 3
+    ADC0_EMUX_R |= 0x5000; // 10) seq3 is timer trigger
+    ADC0_SSMUX3_R = (ADC0_SSMUX3_R&0xFFFFFFF0)+9; // 11) Ain9 (PE4)
+    ADC0_SSCTL3_R = 0x0006; // 12) no TS0 D0, yes IE0 END0
+    ADC0_IM_R |= 0x0008; // 13) enable SS3 interrupts
+    ADC0_ACTSS_R |= 0x0008; // 14) enable sample sequencer 3
+    NVIC_PRI4_R = (NVIC_PRI4_R&0xFFFF00FF) | 0x00004000; // interrupt priority
+    NVIC_EN0_R = 1<<17; // Enable interrupt 17
+}
+
+
 
 void setup()
 {
@@ -119,4 +169,5 @@ void setup()
     reset(); //IR Signal
     SetupSerial();
     SystickInit();
+    A2DSetup();
 }

@@ -18,6 +18,7 @@ int curState = NONE;
 
 extern struct expectedTime et;
 extern struct Car car;
+extern int voltage;
 
 //gets which button was pressed
 int getButton()
@@ -78,9 +79,20 @@ int main(void)
 {
     PLLInit();
     setup();
-    SetupSerial();
+//    SetupSerial();
+    while(1);
+//    {
+//        SerialWriteInt(voltage);
+//        SysTick_Wait10ms(50);
+//    }
 
-    while (1);
+//    while (1) {
+//        ADC0_PSSI_R = 0x0008;
+//        while((ADC0_RIS_R&0x08)==0){};
+//        int voltage = ((ADC0_SSFIFO3_R & 0xFFF)*3300)/4096;
+//        SerialWriteInt(voltage);
+//        Systick_Wait100ms(1);
+//    }
     return 0;
 }
 
@@ -97,6 +109,7 @@ void action(int button)
         case CIRCLE: return halt();
     }
 }
+
 
 
 //this is a handler for the IR receiver
