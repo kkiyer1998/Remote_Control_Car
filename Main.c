@@ -12,13 +12,12 @@
 
 #define TOLERANCE 20
 
-int  period = 0, first = 0;
+int  period = 0, first = 0, voltage = 0;
 
 int curState = NONE;
 
 extern struct expectedTime et;
 extern struct Car car;
-extern int voltage;
 
 //gets which button was pressed
 int getButton()
@@ -79,20 +78,20 @@ int main(void)
 {
     PLLInit();
     setup();
-//    SetupSerial();
-    while(1);
-//    {
-//        SerialWriteInt(voltage);
-//        SysTick_Wait10ms(50);
-//    }
+    SetupSerial();
 
-//    while (1) {
-//        ADC0_PSSI_R = 0x0008;
-//        while((ADC0_RIS_R&0x08)==0){};
-//        int voltage = ((ADC0_SSFIFO3_R & 0xFFF)*3300)/4096;
-//        SerialWriteInt(voltage);
-//        Systick_Wait100ms(1);
-//    }
+    while (1)
+    {
+        //SerialWriteInt(voltage);
+        if (voltage > 1000 && car.direction == FORWARD)
+        { // approximately 11 cm or less away
+
+            halt();
+            commitChange();
+            int local = voltage;
+        }
+        SysTick_Wait10ms(10);
+    }
     return 0;
 }
 
@@ -102,14 +101,13 @@ void action(int button)
     switch (button)
     {
         case POWER: return power();
-        case UP: return increaseSpeed();
-        case DOWN: return decreaseSpeed();
+        case UP: return car.direction == FORWARD ? increaseSpeed() : decreaseSpeed();
+        case DOWN: return car.direction != FORWARD ? increaseSpeed() : decreaseSpeed();
         case LEFT: return turnLeft();
         case RIGHT: return turnRight();
         case CIRCLE: return halt();
     }
 }
-
 
 
 //this is a handler for the IR receiver
@@ -120,8 +118,6 @@ void Timer2A_Handler(void)
 {
 
     period = (first-TIMER2_TAR_R) & 0x00FFFFFF;
-    //SerialWriteInt(first);
-    //SerialWriteInt(TIMER2_TAR_R);
 
     int local = period;
     read(period);
@@ -132,12 +128,16 @@ void Timer2A_Handler(void)
         SerialWriteInt(button);
         action(button);
         commitChange(); //reflects the changes on the data-structure to car
-        reset();
+        SysTick_Wait1ms(1); //debounce
     }
     first = TIMER2_TAR_R ;
-    //SerialWriteInt(first);
-    //SerialWriteInt(0);
     TIMER2_ICR_R = 0x00000004; //acknowledgement
+}
+
+
+void Timer3A_Handler(void) {
+    ADC0_ISC_R = 0x008;
+    voltage = ADC0_SSFIFO3_R;
 }
 
 

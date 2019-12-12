@@ -108,6 +108,7 @@ void portFSetup()
     GPIO_PORTF_PUR_R = 0XFF;
 }
 
+
 void A2DSetup() {
 //    SYSCTL_RCGCGPIO_R |= 0x10; // 1) activate clock for Port E
 //    while((SYSCTL_PRGPIO_R&0x10) == 0){};
@@ -171,3 +172,4 @@ void setup()
     SystickInit();
     A2DSetup();
 }
+
